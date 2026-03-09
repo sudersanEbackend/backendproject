@@ -60,8 +60,9 @@ exports.login = async (req, res) => {
   }
 };
 
-  } catch (error) {
+   catch (error) {
     res.status(500).json({ message: error.message });
   }
 
 };
+
