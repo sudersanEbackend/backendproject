@@ -1,35 +1,51 @@
 require("dotenv").config();
- 
+
 const express = require("express");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const cors = require("cors");
- 
+
 const app = express();
- 
-// Connect to MongoDB
+
+
+// Connect MongoDB
 connectDB();
- 
-// Enable CORS
-app.use(cors({
-  origin: "*"
-}));
- 
+
+
 // Middleware
 app.use(express.json());
- 
+
+
+// Enable CORS (Allow S3 frontend)
+app.use(cors({
+  origin: "*",
+  methods: ["GET","POST","PUT","DELETE"],
+  allowedHeaders: ["Content-Type","Authorization"]
+}));
+
+
 // Routes
 app.use("/api/auth", authRoutes);
- 
-// Start server
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
+
+
+// Test Route (optional but useful)
+app.get("/", (req,res)=>{
+  res.send("API is running...");
 });
- 
-// 404 handler
-app.use((req, res) => {
+
+
+// 404 Handler
+app.use((req,res)=>{
   res.status(404).json({
-    status: "error",
-    message: "404 Error - Not Found"
+    status:"error",
+    message:"404 - Route Not Found"
   });
-});   
+});
+
+
+// Start Server
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, ()=>{
+  console.log(`Server running on port ${PORT}`);
+});
