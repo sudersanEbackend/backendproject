@@ -6,8 +6,23 @@ const jwt = require("jsonwebtoken");
 exports.register = async (req, res) => {
   try {
 
-    const { name, email, password } = req.body;
+    const { name, email, password,confirmPassword } = req.body;
+    // CHECK EMPTY FIELDS
+if (!name || !email || !password) {
+  return res.status(400).json({ message: "All fields are required" });
+}
+if (password !== confirmPassword) {
+  return res.status(400).json({ message: "Passwords do not match" });
+}
 
+// STRONG PASSWORD VALIDATION
+const passwordPattern = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
+
+if (!passwordPattern.test(password)) {
+  return res.status(400).json({
+    message: "Password must contain 8 characters, uppercase, number and special character"
+  });
+}
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -35,6 +50,9 @@ exports.login = async (req, res) => {
   try {
 
     const { email, password } = req.body;
+    if (!email || !password) {
+  return res.status(400).json({ message: "Email and password are required" });
+}
 
     const user = await User.findOne({ email });
 
@@ -63,3 +81,4 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
